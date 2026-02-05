@@ -6,8 +6,23 @@ get_header();
 ?>
 
 <!-- Hero -->
-<section class="hero">
-    <div class="hero-bg">
+<?php
+// Hero background: use Customizer setting, or find the uploaded hero-bg image
+$hero_bg = get_theme_mod('eventhaus_hero_bg', '');
+if (!$hero_bg) {
+    $hero_att = get_posts([
+        'post_type'      => 'attachment',
+        'posts_per_page' => 1,
+        'post_status'    => 'inherit',
+        's'              => 'hero-bg',
+    ]);
+    if ($hero_att) {
+        $hero_bg = wp_get_attachment_image_url($hero_att[0]->ID, 'full');
+    }
+}
+?>
+<section class="hero<?php echo $hero_bg ? ' hero--has-bg' : ''; ?>">
+    <div class="hero-bg"<?php echo $hero_bg ? ' style="background-image:url(\'' . esc_url($hero_bg) . '\');"' : ''; ?>>
         <div class="hero-pattern"></div>
     </div>
     <div class="hero-line"></div>
