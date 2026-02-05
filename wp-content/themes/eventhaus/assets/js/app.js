@@ -193,20 +193,23 @@ document.addEventListener('DOMContentLoaded', () => {
         }, { passive: true });
     }
 
-    // Wait for GSAP
-    if (typeof gsap === 'undefined') return;
+    // Wait for GSAP — content stays visible if GSAP fails (progressive enhancement)
+    if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
 
     gsap.registerPlugin(ScrollTrigger);
+
+    // Mark body so CSS knows GSAP is ready
+    document.body.classList.add('gsap-ready');
 
     // Hero entrance
     const heroContent = document.querySelector('.hero-content');
     if (heroContent) {
         const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
-        tl.from('.hero .section-label', { autoAlpha: 0, y: 30, duration: 0.8 })
-          .from('.hero-title', { autoAlpha: 0, y: 40, duration: 1 }, '-=0.4')
-          .from('.hero-subtitle', { autoAlpha: 0, y: 30, duration: 0.8 }, '-=0.5')
-          .from('.hero-actions .btn', { autoAlpha: 0, y: 20, duration: 0.6, stagger: 0.15 }, '-=0.3')
-          .from('.hero-stat', { autoAlpha: 0, x: 30, duration: 0.6, stagger: 0.2 }, '-=0.5');
+        tl.fromTo('.hero .section-label', { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: 0.8 })
+          .fromTo('.hero-title', { autoAlpha: 0, y: 40 }, { autoAlpha: 1, y: 0, duration: 1 }, '-=0.4')
+          .fromTo('.hero-subtitle', { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: 0.8 }, '-=0.5')
+          .fromTo('.hero-actions .btn', { autoAlpha: 0, y: 20 }, { autoAlpha: 1, y: 0, duration: 0.6, stagger: 0.15 }, '-=0.3')
+          .fromTo('.hero-stat', { autoAlpha: 0, x: 30 }, { autoAlpha: 1, x: 0, duration: 0.6, stagger: 0.2 }, '-=0.5');
     }
 
     // Reveal on scroll

@@ -61,23 +61,35 @@ get_header();
                 'orderby'    => 'name',
             ]);
 
-            // Category icons/emojis as visual placeholders
-            $cat_icons = [
-                'Seating'  => '◈',
-                'Tables'   => '▭',
-                'Lighting' => '✦',
-                'Lounge'   => '◇',
-                'Decor'    => '❋',
-                'Staging'  => '▣',
-            ];
-
             if ($categories && !is_wp_error($categories)) :
                 foreach ($categories as $cat) :
                     $count = $cat->count;
-                    $icon = $cat_icons[$cat->name] ?? '◆';
+
+                    // Get featured image from first item in this category
+                    $cat_items = new WP_Query([
+                        'post_type'      => 'rental_item',
+                        'posts_per_page' => 1,
+                        'tax_query'      => [[
+                            'taxonomy' => 'rental_category',
+                            'field'    => 'term_id',
+                            'terms'    => $cat->term_id,
+                        ]],
+                        'meta_key'       => '_thumbnail_id',
+                        'orderby'        => 'date',
+                        'order'          => 'DESC',
+                    ]);
+                    $cat_image = '';
+                    if ($cat_items->have_posts()) {
+                        $cat_image = get_the_post_thumbnail_url($cat_items->posts[0]->ID, 'catalogue-card');
+                    }
+                    wp_reset_postdata();
             ?>
                 <a href="<?php echo get_term_link($cat); ?>" class="category-card">
-                    <div class="category-card-bg" style="display:flex; align-items:center; justify-content:center; font-size:4rem; color:var(--border);"><?php echo $icon; ?></div>
+                    <?php if ($cat_image) : ?>
+                        <div class="category-card-bg" style="background-image:url('<?php echo esc_url($cat_image); ?>');"></div>
+                    <?php else : ?>
+                        <div class="category-card-bg"></div>
+                    <?php endif; ?>
                     <div class="category-card-overlay"></div>
                     <div class="category-card-content">
                         <h3 class="category-card-name"><?php echo esc_html($cat->name); ?></h3>
