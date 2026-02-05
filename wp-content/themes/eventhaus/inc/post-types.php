@@ -7,6 +7,19 @@ defined('ABSPATH') || exit;
 
 add_action('init', function () {
 
+    // ─── Rental Category Taxonomy (registered first for rewrite priority) ─
+    register_taxonomy('rental_category', 'rental_item', [
+        'labels' => [
+            'name'          => __('Categories', 'eventhaus'),
+            'singular_name' => __('Category', 'eventhaus'),
+            'add_new_item'  => __('Add New Category', 'eventhaus'),
+        ],
+        'public'       => true,
+        'hierarchical' => true,
+        'rewrite'      => ['slug' => 'catalogue/category', 'with_front' => false, 'hierarchical' => true],
+        'show_in_rest' => true,
+    ]);
+
     // ─── Rental Item CPT ───────────────────────────────────────
     register_post_type('rental_item', [
         'labels' => [
@@ -24,19 +37,7 @@ add_action('init', function () {
         'supports'           => ['title', 'editor', 'thumbnail', 'excerpt'],
         'show_in_rest'       => true,
         'publicly_queryable' => true,
-    ]);
-
-    // ─── Rental Category Taxonomy ──────────────────────────────
-    register_taxonomy('rental_category', 'rental_item', [
-        'labels' => [
-            'name'          => __('Categories', 'eventhaus'),
-            'singular_name' => __('Category', 'eventhaus'),
-            'add_new_item'  => __('Add New Category', 'eventhaus'),
-        ],
-        'public'       => true,
-        'hierarchical' => true,
-        'rewrite'      => ['slug' => 'catalogue/category', 'with_front' => false],
-        'show_in_rest' => true,
+        'taxonomies'         => ['rental_category'],
     ]);
 
     // ─── Quote Request CPT (admin only) ────────────────────────
